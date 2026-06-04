@@ -1,5 +1,6 @@
-import os
-import sys
+import subprocess
+
+subprocess.run('ollama, llama3.1')
 
 
 # Set folder location of main budget document
