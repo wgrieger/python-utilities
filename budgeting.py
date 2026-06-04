@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 # Set folder location of main budget document
 
 # Set folder location of raw inputs
