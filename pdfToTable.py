@@ -3,7 +3,7 @@ from tabulate import tabulate
 from pathlib import Path
 
 
-filePath = Path(r"C:\Users\willg\OneDrive\Documents\OneDrive\Documents\Personal Finance\2025 Taxes\1117 Spring St 2025.pdf")
+filePath = Path(r"C:\Users\will")
 
 pdf  = pdfplumber.open(filePath)
 
