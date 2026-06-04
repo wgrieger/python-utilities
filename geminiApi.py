@@ -11,7 +11,7 @@ load_dotenv()
 
 # Turn VPN off for large files
 
-client = genai.Client(api_key=os.environ.get['PYTHON_GEMINI_KEY'])
+client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
 
 prompt = """
 [insert prompt]
