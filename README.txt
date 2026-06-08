@@ -12,3 +12,6 @@ Some of the example uses are:
 -geminiApi.py is a blank slate to run more intensive tasks through the API, which is much more performant, as opposed to the web interface.
 
 -budgeting.py is going to use a local LLama 3.1:8B model to update my personal finance tracking excel files
+
+Bash Command to Activate my venv
+    'source .venv/bin/activate'
