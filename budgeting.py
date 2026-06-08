@@ -5,7 +5,7 @@ import os
 # Set folder location of main budget document
 budgetExcelDoc = os.path.expanduser("~/Documents/Personal Budgeting/Grieger Personal Budget Tracker.xlsm")
 
-rawTransactionFolder = os.path.expanduser("~/Documents/Personal Budgeting/")
+rawTransactionFolder = os.path.expanduser("~/Documents/Personal Budgeting/Raw Transaction Data")
                                           
 # Set folder location of raw inputs
     # Loop through to combine as one file?
@@ -18,30 +18,33 @@ rawTransactionFolder = os.path.expanduser("~/Documents/Personal Budgeting/")
 
 
 prompt = '''
-You will be passed credit card or similiar transaction data as a row of comma seperated values.
+You are a data processing script. Your task is to clean credit card transaction rows and assign them to a strict set of categories.
 
-Your role will be to clean the data and assign a category. There will be a category provided that may or not match perfectly. 
-Use your best judgement to assign one of the defined ones.
+Input format: A single row of comma-separated values (CSV).
 
-The categories are:
-Dining - e.g. Resturaunts, delivery apps, food courts. 
-Gas/Automotive - e.g. Gas stations, car maintenance, dealerships, car stores (e.g. NAPA/Autozone)
-Merchandise -- General retail purchases that don't fit in another category e.g. Amazon, online '.com' orders
-Grocery -- e.g. Walmart, Target, and common grocers even not coded as such by the card company 
-Entertainment -- e.g. Movie theatres, theme parks, events 
-Subscription -- Monthly or annual digital charges such as Apple Music, email, VPN, etc.
-Travel -- Airlines, hotels, Ubers, etc. 
-Professional Services -- Service businesses that don't fit under other categories e.g. accounting, hair cuts
-Health Care / Gym -- Healthcare, wellness, and gym services e.g. memberships, saunas, co-pays
-Homeownership -- Notably, Home Depot or contractor bills
-Education -- Booth School of Business or online educational resources 
-Charity -- Donations 
+Rules:
+1. If the row is a header, empty, or does not contain a valid transaction, output exactly: "SKIP"
+2. Clean the vendor name to be human-readable (e.g., "AMZN MKTP US*123" -> "Amazon").
+3. Convert all transaction amounts to a positive number.
+4. Assign exactly one of the allowed categories below. Do not create new categories.
 
-Please review the tranaction data and return it in this format:
+Allowed Categories:
+- Dining: Restaurants, delivery apps, bars, food courts.
+- Gas/Automotive: Gas stations, car maintenance, dealerships, auto parts stores.
+- Merchandise: General retail, Amazon, online shopping orders not fitting elsewhere.
+- Grocery: Supermarkets, grocery stores, Target, Walmart.
+- Entertainment: Movie theaters, concerts, theme parks, events.
+- Subscription: Recurring digital charges (e.g., streaming, software, VPN).
+- Travel: Airlines, hotels, rideshares (Ubers/Lyft), public transit.
+- Professional Services: Personal and business services (e.g., accounting, haircuts).
+- Health Care / Gym: Medical co-pays, pharmacies, fitness memberships, wellness.
+- Homeownership: Hardware stores (e.g., Home Depot, Lowe's), contractor bills.
+- Education: Tuition, school fees, online educational platforms.
+- Charity: Donations and non-profit contributions.
+- Interest / Fees: Card annual fees, bank fees, interest charges.
 
-"[transaction date],[transaction vendor (where the money was spent)],[amount of spend as positive number (how much money was spent)],
-[assigned category]"
-
+Output format: Return only the raw text in this exact format, with no markdown, no quotes, and no conversational filler:
+[transaction date],[cleaned transaction vendor],[positive amount],[assigned category]
 '''
 
 result = subprocess.run(['ollama', 'run', 'llama3.1',prompt],capture_output=True, text=True)
