@@ -3,6 +3,8 @@ import subprocess
 import os
 import csv
 from google import genai
+from dotenv import load_dotenv
+load_dotenv()
 
 client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
 
@@ -33,9 +35,12 @@ and with no other commentary in the response:
 
 Rules:
 - Don't include the brackets or quotes in your response
-- Don't ever add any text that doesn't fit the the response criteria provided
+- Don't ever add any text that doesn't fit the the response criteria provided, including in an initital response
 - Use the context provided in the data to aid your categorization
 - The response is being processed by code, so it is imperitive it is structured exactly as ordered and never deviates at all.
+    i.e. do not respond anything like 'Please provide the row of data you would like me to process.'
+- If data is blank, return 0
+
 
 Allowed Categories:
 - Dining: Restaurants, delivery apps, bars, food courts.
@@ -51,23 +56,24 @@ Allowed Categories:
 - Education: Tuition, school fees, online educational platforms.
 - Charity: Donations and non-profit contributions.
 - Interest / Fees: Card annual fees, bank fees, interest charges.
+
+Here is the data to process:
 '''
 
-def llmQuery(transaction):
-    input = prompt + transaction 
-    query = subprocess.run(['ollama', 'run', 'llama3.1',input],capture_output=True, text=True)
-    output = query.stdout
-    return output
+# def llmQuery(transaction):
+#     input = prompt + transaction 
+#     query = subprocess.run(['ollama', 'run', 'llama3.1',input],capture_output=True, text=True)
+#     output = query.stdout
+#     return output
 
 def geminiQuery(transaction):
     input = prompt + transaction 
     response = client.models.generate_content(
-                    model="gemini-3.5-flash",
+                    model="gemini-3.1-flash-lite",
                     contents=[input]
                 )
-    return response
+    return response.text
 
-# print(result.stdout)
 
 #------------------
 # File Loop  
