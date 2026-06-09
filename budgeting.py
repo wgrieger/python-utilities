@@ -1,7 +1,7 @@
-import openpyxl
 import subprocess
 import os
 import csv
+import pandas
 from google import genai
 from dotenv import load_dotenv
 load_dotenv()
@@ -14,13 +14,16 @@ client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
 
 budgetExcelDoc = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Grieger Personal Budget Tracker.xlsm")
 
+# with open_xlsx(budgetExcelDoc) as wb:
+#     workSheet= wb['2026']
+
 rawTransactionFolder = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Raw Transaction Data")
 
 # which worksheet within budget excel doc? 
 # define 2026 somehow 
 
 #------------------
-# Prompt for LLM
+# Prompt and Function for LLM
 #------------------
 
 prompt = '''
@@ -88,12 +91,14 @@ for file in os.listdir(rawTransactionFolder):
 
     if fileType == ".csv":
         with open(completeFilePath, newline='') as csvfile:
-            for row in csvfile:
-                 print(geminiQuery(row))
-                 
+            # for row in csvfile:
+            #      print(geminiQuery(row))
+            print('skip csv')   
 
     elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
-         ''
+        file = pd.ExcelFile(completeFilePath)
+        with pd.ExcelFile(completeFilePath) as xls:
+            print(pd.read_excel(xls))
     
 
 
