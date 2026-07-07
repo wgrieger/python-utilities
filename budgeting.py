@@ -1,5 +1,4 @@
 import os
-import csv
 import pandas
 from google import genai
 from dotenv import load_dotenv
@@ -11,7 +10,7 @@ client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
 # Set Folder and File Locations 
 #------------------
 
-budgetExcelDoc = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Grieger Personal Budget Tracker.xlsm")
+budgetFolder = os.path.expanduser("~/Documents/Personal Finance/Budgeting")
 
 rawTransactionFolder = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Save Transaction Data Here")
 
@@ -40,7 +39,8 @@ If it is a credit card spending transaction, match it to one of the categories b
 - Interest / Fees: Card annual fees, bank fees, interest charges.
 
 Rules:
-- Don't ever add any text or characters that don't fit the the response criteria provided, including in an initial response
+- Don't ever add any text or characters that don't fit the the response criteria provided, including in an initial response or if there are no transactions
+  on the document at all. If that is the case, return '0,0,0,0' and nothing else. 
 - Use the context provided in the data to aid your categorization
 - it is imperative it is structured exactly as ordered and never deviates at all.
 i.e. do not respond anything like 'Please provide the row of data you would like me to process.'
@@ -56,12 +56,19 @@ Finally, return as text in the CSV format all of the transactions with this exac
 '''
 
 def geminiQuery(file): 
-    response = client.models.generate_content(
-                    model="gemini-3.5-flash",
-                    contents=[prompt,file]
-                )
-    
-    open('~/Documents/Personal Finance/Budgeting/Combined Output.csv',"a").write(response.text)
+    attempt = 0
+    while attempt<11:
+        try:
+            response = client.models.generate_content(
+                            model="gemini-3.5-flash",
+                            contents=[prompt,file]
+                        )          
+        except: 
+            attempt = attempt+1
+            print("something didn't work. Trying again.")
+            print("attempt: "+ attempt)
+            
+    open(budgetFolder+'/Combined Output.csv','a').write(response.text)
     print('file processed and saved to csv')
 
 
@@ -69,43 +76,20 @@ def geminiQuery(file):
 # File Loop  
 #------------------
 
-# frozen from looping
-# for file in os.listdir(rawTransactionFolder):
+for file in os.listdir(rawTransactionFolder):
 
-file = os.listdir(rawTransactionFolder)[0]
+    print(file) 
 
-# print(file) 
-
-# reindent below here
-locateDot = file.rindex('.')
-fileType = file[locateDot:len(file)]
+    locateDot = file.rindex('.')
+    fileType = file[locateDot:len(file)]
     
-completeFilePath = rawTransactionFolder + '/' + file
+    completeFilePath = rawTransactionFolder + '/' + file
 
 
-if fileType == ".csv":
-    with open(completeFilePath, newline='') as csvfile:
-            # for row in csvfile:
-            #      print(geminiQuery(row))
-            print('skip csv')   
+    if fileType == ".csv":
+        file = open(completeFilePath, 'rb').read()
+        geminiQuery(file)
 
-elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
-    file = pandas.read_excel(completeFilePath).to_csv().encode()
-    geminiQuery(file)
-
-
-
-# print(testTransaction)
-# print(type(testTransaction))
-# end indent 
-
-# print(geminiQuery(testTransaction))
-
-#------------------
-# Logic for Handling Result
-#------------------
-
-
-# if !skip 
-# parse by comma and add to excel 
-
+    elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
+        file = pandas.read_excel(completeFilePath).to_csv().encode()
+        geminiQuery(file)
