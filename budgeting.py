@@ -1,7 +1,6 @@
 import subprocess
 import os
-import csv
-import pandas
+import pandas as pd
 from google import genai
 from dotenv import load_dotenv
 load_dotenv()
@@ -70,7 +69,8 @@ Here is the data to process:
 #     return output
 
 def geminiQuery(transaction):
-    input = prompt + transaction 
+    input = prompt + transaction
+    # print(input) 
     response = client.models.generate_content(
                     model="gemini-3.1-flash-lite",
                     contents=[input]
@@ -82,25 +82,44 @@ def geminiQuery(transaction):
 # File Loop  
 #------------------
 
-for file in os.listdir(rawTransactionFolder):
+# frozen from looping
+# for file in os.listdir(rawTransactionFolder):
 
-    locateDot = file.rindex('.')
-    fileType = file[locateDot:len(file)]
+file = os.listdir(rawTransactionFolder)[0]
+
+# print(file) 
+
+# reindent below here
+locateDot = file.rindex('.')
+fileType = file[locateDot:len(file)]
     
-    completeFilePath = rawTransactionFolder + '/' + file
+completeFilePath = rawTransactionFolder + '/' + file
 
-    if fileType == ".csv":
-        with open(completeFilePath, newline='') as csvfile:
+# print(completeFilePath)
+
+if fileType == ".csv":
+    with open(completeFilePath, newline='') as csvfile:
             # for row in csvfile:
             #      print(geminiQuery(row))
             print('skip csv')   
 
-    elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
-        file = pd.ExcelFile(completeFilePath)
-        with pd.ExcelFile(completeFilePath) as xls:
-            print(pd.read_excel(xls))
-    
+elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
+    #    here is the total file 
+       openFile = pd.read_excel(completeFilePath,0)
+    #    row = 0
+    #    for row in openFile:
+    #     print(openFile[row])
+    #     row=row+1
 
+testTransaction = (openFile.loc[10]).to_string()
+
+
+
+# print(testTransaction)
+# print(type(testTransaction))
+# end indent 
+
+print(geminiQuery(testTransaction))
 
 #------------------
 # Logic for Handling Result
