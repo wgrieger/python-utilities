@@ -1,5 +1,6 @@
 import os
-import pandas as pd
+import csv
+import pandas
 from google import genai
 from dotenv import load_dotenv
 load_dotenv()
@@ -12,16 +13,14 @@ client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
 
 budgetExcelDoc = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Grieger Personal Budget Tracker.xlsm")
 
-
-rawTransactionFolder = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Raw Transaction Data")
+rawTransactionFolder = os.path.expanduser("~/Documents/Personal Finance/Budgeting/Save Transaction Data Here")
 
 #------------------
 # Prompt and Function for LLM
 #------------------
 
 prompt = '''
- Here is a spreadsheets of credit card transactions. Look at each row and follow these instructions\
-carefully.
+ Here is a spreadsheets of credit card transactions. Look at each row and follow these instructions carefully.
 
 If it is not a credit card transaction or you believe it to be a payment, ignore the data.
 
@@ -56,15 +55,14 @@ Finally, return as text in the CSV format all of the transactions with this exac
 '[transaction date],[cleaned and formatted vendor name],[transaction amount as positive number],[assigned category]' 
 '''
 
-
-def geminiQuery(transaction):
-    input = prompt + transaction
-    # print(input) 
+def geminiQuery(file): 
     response = client.models.generate_content(
-                    model="gemini-3.1-flash-lite",
-                    contents=[input]
+                    model="gemini-3.5-flash",
+                    contents=[prompt,file]
                 )
-    return response.text
+    
+    open('~/Documents/Personal Finance/Budgeting/Combined Output.csv',"a").write(response.text)
+    print('file processed and saved to csv')
 
 
 #------------------
@@ -84,7 +82,6 @@ fileType = file[locateDot:len(file)]
     
 completeFilePath = rawTransactionFolder + '/' + file
 
-# print(completeFilePath)
 
 if fileType == ".csv":
     with open(completeFilePath, newline='') as csvfile:
@@ -93,14 +90,8 @@ if fileType == ".csv":
             print('skip csv')   
 
 elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
-    #    here is the total file 
-       openFile = pd.read_excel(completeFilePath,0)
-    #    row = 0
-    #    for row in openFile:
-    #     print(openFile[row])
-    #     row=row+1
-
-testTransaction = (openFile.loc[10]).to_string()
+    file = pandas.read_excel(completeFilePath).to_csv().encode()
+    geminiQuery(file)
 
 
 
@@ -108,7 +99,7 @@ testTransaction = (openFile.loc[10]).to_string()
 # print(type(testTransaction))
 # end indent 
 
-print(geminiQuery(testTransaction))
+# print(geminiQuery(testTransaction))
 
 #------------------
 # Logic for Handling Result
