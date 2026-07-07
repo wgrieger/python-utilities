@@ -66,7 +66,7 @@ def geminiQuery(file):
         except: 
             attempt = attempt+1
             print("something didn't work. Trying again.")
-            print("attempt: "+ attempt)
+            print("attempt: "+ str(attempt))
             
     open(budgetFolder+'/Combined Output.csv','a').write(response.text)
     print('file processed and saved to csv')
