@@ -20,7 +20,7 @@ rawTransactionFolder = os.path.expanduser("~/Documents/Personal Finance/Budgetin
 #------------------
 
 prompt = '''
- Here is a spreadsheets of credit card transactions. Look at each row and follow these instructions carefully.
+ Here is a spreadsheet of credit card transactions. Look at each row and follow these instructions carefully.
 
 If it is not a credit card transaction or you believe it to be a payment, ignore the data.
 
