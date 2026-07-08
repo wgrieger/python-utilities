@@ -2,6 +2,7 @@ import os
 import pandas
 from google import genai
 from dotenv import load_dotenv
+import time
 load_dotenv()
 
 client = genai.Client(api_key=os.environ.get('PYTHON_GEMINI_KEY'))
@@ -40,7 +41,7 @@ If it is a credit card spending transaction, match it to one of the categories b
 
 Rules:
 - Don't ever add any text or characters that don't fit the the response criteria provided, including in an initial response or if there are no transactions
-  on the document at all. If that is the case, return '0,0,0,0' and nothing else. 
+  on the document at all. If that is the case, cancel and return 'ignore' exactly.
 - Use the context provided in the data to aid your categorization
 - it is imperative it is structured exactly as ordered and never deviates at all.
 i.e. do not respond anything like 'Please provide the row of data you would like me to process.'
@@ -57,39 +58,42 @@ Finally, return as text in the CSV format all of the transactions with this exac
 
 def geminiQuery(file): 
     attempt = 0
-    while attempt<11:
+    fail = True
+    while attempt<11 and fail==True:
         try:
             response = client.models.generate_content(
                             model="gemini-3.5-flash",
                             contents=[prompt,file]
-                        )          
+                        )      
+            fail = False
         except: 
             attempt = attempt+1
             print("something didn't work. Trying again.")
             print("attempt: "+ str(attempt))
-            
-    open(budgetFolder+'/Combined Output.csv','a').write(response.text)
-    print('file processed and saved to csv')
-
+            time.sleep(5)
+    
+    if response.text != "ignore":         
+        open(budgetFolder+'/Combined Output.csv','a').write("\n"+response.text)
+        print('file processed and saved to csv')
+    else: 
+        print('no response')
 
 #------------------
 # File Loop  
 #------------------
-
 for file in os.listdir(rawTransactionFolder):
-
-    print(file) 
+    print(file)
 
     locateDot = file.rindex('.')
     fileType = file[locateDot:len(file)]
     
     completeFilePath = rawTransactionFolder + '/' + file
 
-
     if fileType == ".csv":
         file = open(completeFilePath, 'rb').read()
         geminiQuery(file)
 
-    elif fileType == ".xlsx" or ".xlsm" or ".xtlx" or ".xtlm":
+    elif fileType == ".xlsx" or fileType == ".xlsm" or fileType ==".xtlx" or fileType ==".xtlm":
         file = pandas.read_excel(completeFilePath).to_csv().encode()
         geminiQuery(file)
+    
