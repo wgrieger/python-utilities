@@ -62,7 +62,7 @@ def geminiQuery(file):
     while attempt<11 and fail==True:
         try:
             response = client.models.generate_content(
-                            model="gemini-3.5-flash",
+                            model="gemini-flash-latest",
                             contents=[prompt,file]
                         )      
             fail = False
