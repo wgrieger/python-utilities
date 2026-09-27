@@ -75,7 +75,7 @@ for each in os.listdir(folderPath):
     engine.runAndWait()
     time.sleep(0.2)
 
-    if each.endsswith(".pdf"):
+    if each.endswith(".pdf"):
         # -----------
         # pdfplumber functions
         # ------------
