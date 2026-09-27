@@ -12,11 +12,11 @@ import time
 
 # Voice quality was great
 
-# Put txt file in folder and link here 
-folderPath = os.path.expanduser("~/Desktop/")
+# Put txt file in folder and link here. Leave trailing slash.  
+folderPath = os.path.expanduser("~/Documents/Books")
 
 # Specify file name
-textFile = "Opinion.txt"
+textFile = "Moby Dick copy.txt"
 
 textToSpeech = folderPath + "/" + textFile
 
