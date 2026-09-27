@@ -132,23 +132,24 @@ for each in os.listdir(folderPath):
     
     filePrompt = """
    Convert this document to plain text as faithfully as possible. 
-Preserve the author's words exactly. Do not rewrite, summarize, correct grammar, or change meaning. 
 
-If a character, word, or passage is unclear, do not guess or reconstruct it from context. Leave a blank space for the unclear portion and continue with the next legible text. 
+   Preserve the author's words exactly. Do not rewrite, summarize, correct grammar, or change meaning. 
 
-Preserve separate blocks of text and their approximate reading order based on their physical position on the page. Do not infer relationships between blocks merely because of their placement, and do not reorganize the content by topic. 
+    If a character, word, or passage is unclear, do not guess or reconstruct it from context. Leave a blank space for the unclear portion and continue with the next legible text. 
 
-Keep text together that clearly belongs together.
+    Preserve separate blocks of text and their approximate reading order based on their physical position on the page. Do not infer relationships between blocks merely because of their placement, and do not reorganize the content by topic. 
 
-Preserve obvious headings, bullets, numbering, arrows, and simple structural relationships when they can be represented clearly in plain text.
+    Keep text together that clearly belongs together.
 
-For drawings or graphics, briefly represent their meaning only when it is unambiguous; otherwise omit them. 
+    Preserve obvious headings, bullets, numbering, arrows, and simple structural relationships when they can be represented clearly in plain text.
 
-For tables, preserve the text and relationships as faithfully as possible in a readable plain-text format. Do not invent labels or relationships that are not explicit.
+    For drawings or graphics, briefly represent their meaning only when it is unambiguous; otherwise omit them. 
 
-Omit repeated page numbers, running headers, and running footers when they are clearly non-substantive.
+    For tables, preserve the text and relationships as faithfully as possible in a readable plain-text format. Do not invent labels or relationships that are not explicit.
 
-The priority is faithful transcription, not interpretation. When uncertain, preserve uncertainty rather than inventing text.
+    Omit repeated page numbers, running headers, and running footers when they are clearly non-substantive.
+
+    The priority is faithful transcription, not interpretation. When uncertain, preserve uncertainty rather than inventing text.
     """
 
 # Flash lite does well for these extractions
@@ -196,13 +197,20 @@ time.sleep(0.2)
 print(notif)
 
 formatPrompt = """
-[insert prompt you want to accompany the request of all bundled together]
+    Here is a collection of documents converted to .txt to be listened to as a TTS audio file. 
+
+    Please read through this and use your best judgement to understand the intended structure and reading order. 
+
+    Then, without changing any wording, preserve the author's words exactly, do not summarize, correct grammar, or change meaning, organize the text in a way that it best presents the intended meaning when read aloud.
+
+    Perhaps no changes are needed. Make changes conservatively. 
+
 """
 
 formatThis = open(saveFileTo+roughFormatOutputTitle + ".txt", "rb").read()
 
 response = client.models.generate_content(
-            model="gemini-pro-latest",
+            model="gemini-flash-latest",
             contents=[formatThis, formatPrompt]
         )
 
