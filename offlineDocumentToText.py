@@ -54,13 +54,13 @@ time.sleep(0.2)
 # --------------------
 
 # For bulk or single file, create a folder with one or many documents. Leave trailing slash off.
-folderPath = os.path.expanduser("~/Documents")
+folderPath = os.path.expanduser("~/Downloads/")
 
 # Adds a file to the folder location
 saveFileTo = folderPath + "/"  
 
 # Future title for cleaned and final text extraction
-fileOutputTitle = "Final Output for Use"
+fileOutputTitle = "Dissenting Opinion"
 
 # Holds the extraction text during the script
 printOutput = ""
@@ -81,9 +81,9 @@ for each in os.listdir(folderPath):
         # ------------
 
         with pdfplumber.open(file) as pdf:  
-            response = extractAllPages(pdf)
+            #response = extractAllPages(pdf)
             # OR 
-            # response = extractSpecificPages(pdf, [0,1,2,3])
+            response = extractSpecificPages(pdf, [43,44,45,46,47,48,49,50])
 
 
         # Adds each file extraction to the bottom of the printOutput variable  
