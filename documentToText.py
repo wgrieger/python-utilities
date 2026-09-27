@@ -84,16 +84,24 @@ def extractSpecificPages(document, specificPages):
 # --------------------
 # Whole folder
 # --------------------
-folderPath = os.path.expanduser("~/Documents/")
 
+# Where the raw files are saved
+# Leave trailing slash off
+folderPath = os.path.expanduser("~/Documents")
+
+# Adds a file to the folder location
 saveFileTo = folderPath + "/"  
 
-roughFormatOutputTitle = "Notes"
+# Raw text extraction before cleaning 
+roughFormatOutputTitle = "Rough Text Output from Flash Lite"
 
-fileOutputTitle = "Notes Output"
+# Cleaned and final text extraction
+fileOutputTitle = "Final Output for Use"
 
+# Holds the extraction text during the script
 printOutput = ""
 
+# Loop through the folder for each file
 for each in os.listdir(folderPath):
     file = folderPath + "/" + each
 
@@ -106,8 +114,10 @@ for each in os.listdir(folderPath):
     engine.runAndWait()
     time.sleep(0.2)
 
+    # Guesses file type for binary 
     mime_type, _ = mimetypes.guess_type(str(each))
-    
+
+    # Fails if unknown
     if mime_type is None:
         notif = "Could not determine MIME type for file: " + each
         print(notif)
@@ -117,15 +127,34 @@ for each in os.listdir(folderPath):
 
         sys.exit()
 
+    # Opens file for API with text prompt
     file = open(file, "rb").read()
     
     filePrompt = """
-    [insert prompt you want to accompany each file]
+   Convert this document to plain text as faithfully as possible. 
+Preserve the author's words exactly. Do not rewrite, summarize, correct grammar, or change meaning. 
+
+If a character, word, or passage is unclear, do not guess or reconstruct it from context. Leave a blank space for the unclear portion and continue with the next legible text. 
+
+Preserve separate blocks of text and their approximate reading order based on their physical position on the page. Do not infer relationships between blocks merely because of their placement, and do not reorganize the content by topic. 
+
+Keep text together that clearly belongs together.
+
+Preserve obvious headings, bullets, numbering, arrows, and simple structural relationships when they can be represented clearly in plain text.
+
+For drawings or graphics, briefly represent their meaning only when it is unambiguous; otherwise omit them. 
+
+For tables, preserve the text and relationships as faithfully as possible in a readable plain-text format. Do not invent labels or relationships that are not explicit.
+
+Omit repeated page numbers, running headers, and running footers when they are clearly non-substantive.
+
+The priority is faithful transcription, not interpretation. When uncertain, preserve uncertainty rather than inventing text.
     """
 
+# Flash lite does well for these extractions
     success = False
     max_retries = 10
-    
+
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -136,7 +165,8 @@ for each in os.listdir(folderPath):
                             ), 
                             filePrompt]
                 )
-            # Note: Changed your "/n" to "\n" for a proper newline
+
+            # Adds each file extraction to the bottom of the printOutput variable holder 
             printOutput = printOutput + "\n" + response.text
             success = True
             time.sleep(2) # Delay between files to prevent rate limiting
@@ -149,19 +179,15 @@ for each in os.listdir(folderPath):
     if not success:
         print(f"Failed to process {each} after {max_retries} attempts. Exiting.")
         sys.exit()
-   
+
+# Saves unmodified printoutput to the raw file    
 open(saveFileTo+roughFormatOutputTitle + ".txt", "w").write(printOutput)
-
-classNotes = os.path.expanduser("~/Documents/")
-
-printOutput = printOutput + "\n" + open(classNotes,'r').read()
-
-open(saveFileTo+roughFormatOutputTitle + ".txt", "w").write(printOutput)
-
 
 # --------------------
 # FORMATTING
 # --------------------
+
+# Sends the raw file to gemini pro for cleaning and checking 
 
 notif = "All files processed. Sending to Gemini for final formatting check..."
 engine.say(notif)
@@ -176,7 +202,7 @@ formatPrompt = """
 formatThis = open(saveFileTo+roughFormatOutputTitle + ".txt", "rb").read()
 
 response = client.models.generate_content(
-            model="gemini-2.5-pro",
+            model="gemini-pro-latest",
             contents=[formatThis, formatPrompt]
         )
 
