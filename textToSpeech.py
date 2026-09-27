@@ -4,13 +4,19 @@ import pyttsx3
 import time
 
 # MacOS can compress to M4A in file browser for more widespread playback 
+
+# invokes macOS’s say command and produces AIFF. Windows does not have say. 
+# The pyttsx3 notification speech should work, 
+# but file generation needs a Windows-compatible implementation—typically 
+# pyttsx3.save_to_file() producing WAV.
+
 # Voice quality was great
 
 # Put txt file in folder and link here 
-folderPath = os.path.expanduser("~/Downloads/")
+folderPath = os.path.expanduser("~/Desktop/")
 
 # Specify file name
-textFile = "Dissenting Opinion.txt"
+textFile = "Opinion.txt"
 
 textToSpeech = folderPath + "/" + textFile
 
