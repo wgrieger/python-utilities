@@ -131,9 +131,9 @@ for each in os.listdir(folderPath):
     file = open(file, "rb").read()
     
     filePrompt = """
-   Convert this document to plain text as faithfully as possible. 
+    Convert this document to plain text as faithfully as possible. 
 
-   Preserve the author's words exactly. Do not rewrite, summarize, correct grammar, or change meaning. 
+    Preserve the author's words exactly. Do not rewrite, summarize, correct grammar, or change meaning. 
 
     If a character, word, or passage is unclear, do not guess or reconstruct it from context. Leave a blank space for the unclear portion and continue with the next legible text. 
 
@@ -146,8 +146,6 @@ for each in os.listdir(folderPath):
     For drawings or graphics, briefly represent their meaning only when it is unambiguous; otherwise omit them. 
 
     For tables, preserve the text and relationships as faithfully as possible in a readable plain-text format. Do not invent labels or relationships that are not explicit.
-
-    Omit repeated page numbers, running headers, and running footers when they are clearly non-substantive.
 
     The priority is faithful transcription, not interpretation. When uncertain, preserve uncertainty rather than inventing text.
     """
@@ -197,11 +195,12 @@ time.sleep(0.2)
 print(notif)
 
 formatPrompt = """
-    Here is a collection of documents converted to .txt to be listened to as a TTS audio file. 
+    Here is a collection of documents converted to .txt. 
 
     Please read through this and use your best judgement to understand the intended structure and reading order. 
 
-    Then, without changing any wording, preserve the author's words exactly, do not summarize, correct grammar, or change meaning, organize the text in a way that it best presents the intended meaning when read aloud.
+    Then, without changing any wording, preserve the author's words exactly, do not summarize, correct grammar, or change meaning, 
+    organize the text in a way that best presents the intended meaning when read from beginning to end.
 
     Perhaps no changes are needed. Make changes conservatively. 
 
