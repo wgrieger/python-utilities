@@ -129,7 +129,7 @@ for each in os.listdir(folderPath):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                    model="gemini-3.1-flash-lite",
+                    model="gemini-flash-lite-latest",
                     contents=[types.Part.from_bytes(
                                 data=file,
                                 mime_type=mime_type,
