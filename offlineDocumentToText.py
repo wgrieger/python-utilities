@@ -3,6 +3,10 @@ import sys
 import time
 import os
 import pyttsx3
+from difflib import SequenceMatcher
+import tabulate
+
+
 
 # --------------------
 # Functions 
@@ -38,6 +42,34 @@ def extractSpecificPages(document, specificPages):
     
     return printOutput
 
+
+def advancedFormattingAll(document):
+    pageNum = 0
+    pageCount = len(document.pages)
+    
+    printOutput = ""
+
+    while pageNum <= pageCount-1:
+        print(pageNum)
+        text = document.pages[pageNum].extract_text(x_tolerance=3, x_tolerance_ratio=None, y_tolerance=3, layout=True, x_density=7.25, y_density=13, line_dir_render=None, char_dir_render=None)
+        tables = document.pages[pageNum].extract_tables(table_settings={})
+
+        printOutput = printOutput+"\n"+text+"\n"+"Tables:"+"\n"
+        
+        for list in tables:
+            tabTable=(tabulate.tabulate(list)+"\n")
+
+            s = SequenceMatcher(None,text,tabTable).quick_ratio()
+
+            if s > 0.45:
+                printOutput = printOutput + tabTable
+                print("table added")
+
+        pageNum = pageNum+ 1
+    
+    return printOutput
+
+
 # --------------------
 # Script Start 
 # --------------------
@@ -54,14 +86,15 @@ time.sleep(0.2)
 # --------------------
 
 # For bulk or single file, create a folder with one or many documents. Leave trailing slash off.
-folderPath = os.path.expanduser("~/Desktop/")
+folderPath = os.path.expanduser("~/Documents/Books")
+
 
 # Adds a file to the folder location
 saveFileTo = folderPath + "/"  
 
 
 # Future title for cleaned and final text extraction
-fileOutputTitle = "Opinion"
+fileOutputTitle = "Entrada Libre v5"
 
 # Holds the extraction text during the script
 printOutput = ""
@@ -70,16 +103,21 @@ printOutput = ""
 # Single File 
 # -------------------------------------
 
-singleFile = ""
+singleFile = "Entrada Libre.pdf"
+
 
 file = folderPath + "/" + singleFile
 
 with pdfplumber.open(file) as pdf:  
-    response = extractAllPages(pdf)
+    # response = extractAllPages(pdf)
     # OR 
     # response = extractSpecificPages(pdf, [43,44,45,46,47,48,49,50])
+    # OR
+    response = advancedFormattingAll(pdf)
 
     printOutput = response
+
+
 
 # -------------------------------------
 # Multi File Model = Loop through the folder for each file
